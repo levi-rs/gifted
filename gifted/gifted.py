@@ -25,7 +25,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Module images2gif
+""" Module gifted
 
 Provides functionality for reading and writing animated GIF images.
 Use write_gif to write a series of numpy arrays or PIL images as an

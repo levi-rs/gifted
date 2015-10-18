@@ -4,10 +4,10 @@ Use setup tools to setup the armory has a standard python module
 from setuptools import setup
 
 setup(
-    name="images2gif",
+    name="gifted",
     version="0.0.1",
     description="Gif creation and manipulation tool",
-    packages=["images2gif"],
+    packages=["gifted"],
     install_requires=[
         'numpy',
         'Pillow',
