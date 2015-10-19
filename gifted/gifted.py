@@ -1108,17 +1108,33 @@ class NeuQuant:
         a = np.argmin((dists*dists).sum(1))
         return a
 
-def load_images(image_directory, extension):
+def load_images(image_directory, extension, prefix=None):
     """
-    Locates image files in image_directory with the specified extension and
-    loads them into memory as PIL/Pillow objects
-    """
-    ex = extension.lower()
+    Locates image files in image_directory with the specified extension and/or
+    prefix, and loads them into memory as PIL/Pillow objects
 
-    images = [i for i in os.listdir(image_directory) if fnmatch(i, "*."+ex)]
+    :param image_directory: string
+    :param extension: string
+    :param prefix: string
+    :returns: List of PIL Image objects
+    """
+    exl = extension.lower()
+    exu = extension.upper()
+
+    # List everything in dir:
+    all_files = os.listdir(image_directory)
+
+    # Prune out unwanted extension types
+    images = [i for i in all_files if fnmatch(i, "*." + exl) or fnmatch(i, "*." + exu)]
+
+    # Prune out unwanted prefix types
+    if prefix:
+        images = [i for i in images if fnmatch(i, prefix + "*")]
+
+    # Sort to maintain order during GIF creation
     images.sort()
 
-    return [Image.open(image_directory+'/'+i) for i in images]
+    return [Image.open(os.path.join(image_directory, i)) for i in images]
 
 
 if __name__ == '__main__':
