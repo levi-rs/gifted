@@ -1,6 +1,6 @@
-# images2gif
+# gifted 
 
-Python 3 compatible images2gif.py
+GIF creation and manipulation tool
 
 ## Installation
 ```
