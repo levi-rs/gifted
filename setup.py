@@ -14,6 +14,7 @@ setup(
     install_requires=[
         'numpy',
         'Pillow',
+        'tox',
     ],
     keywords="gif animated image",
     classifiers=[
