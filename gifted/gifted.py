@@ -40,7 +40,6 @@ Usefull links
 """
 
 import os
-import time
 from fnmatch import fnmatch
 
 try:
@@ -86,7 +85,7 @@ def check_images(images):
         elif np and isinstance(img, np.ndarray):
             # Check and convert dtype
             if img.dtype == np.uint8:
-                images2.append(img) # Ok
+                images2.append(img)  # Ok
             elif img.dtype in [np.float32, np.float64]:
                 img = img.copy()
                 img[img < 0] = 0
@@ -98,7 +97,7 @@ def check_images(images):
                 images2.append(img)
             # Check size
             if img.ndim == 2:
-                pass # ok
+                pass  # ok
             elif img.ndim == 3:
                 if img.shape[2] not in [3, 4]:
                     raise ValueError('This array can not represent an image.')
@@ -157,16 +156,16 @@ class GifWriter(object):
         """
         # Defaule use full image and place at upper left
         if coords is None:
-            coords  = (0, 0)
+            coords = (0, 0)
 
         # Image separator
         descriptor = b'\x2C'
 
         # Image position and size
-        descriptor += int_to_bin(coords[0]) # Left position
-        descriptor += int_to_bin(coords[1]) # Top position
-        descriptor += int_to_bin(img.size[0]) # image width
-        descriptor += int_to_bin(img.size[1]) # image height
+        descriptor += int_to_bin(coords[0])    # Left position
+        descriptor += int_to_bin(coords[1])    # Top position
+        descriptor += int_to_bin(img.size[0])  # image width
+        descriptor += int_to_bin(img.size[1])  # image height
 
         # packed field: local color table flag1, interlace0, sorted table0,
         # reserved00, lct size111=7=2^(7+1)=256.
@@ -186,10 +185,10 @@ class GifWriter(object):
 
         if loops == 0 or loops == float('inf'):
             loops = 2**16-1
-            #bb = "" # application extension should not be used
-                    # (the extension interprets zero loops
-                    # to mean an infinite number of loops)
-                    # Mmm, does not seem to work
+            # bb = ""  # application extension should not be used
+            #          # (the extension interprets zero loops
+            #          # to mean an infinite number of loops)
+            #          # Mmm, does not seem to work
 
         ext = b"\x21\xFF\x0B"  # application extension
         ext += b"NETSCAPE2.0"
@@ -221,10 +220,10 @@ class GifWriter(object):
         """
 
         ext = b'\x21\xF9\x04'
-        ext += bytes([((dispose & 3) << 2)|(transparent_flag & 1)])  # low bit 1 == transparency,
+        ext += bytes([((dispose & 3) << 2) | (transparent_flag & 1)])  # low bit 1 == transparency,
         # 2nd bit 1 == user input , next 3 bits, the low two of which are used,
         # are dispose.
-        ext += int_to_bin(int(duration*100)) # in 100th of seconds
+        ext += int_to_bin(int(duration * 100))  # in 100th of seconds
         ext += bytes([transparency_index])
         ext += b'\x00'  # end
 
@@ -265,7 +264,7 @@ class GifWriter(object):
             for i in range(len(images)):
                 image = images[i]
                 if isinstance(image, Image.Image):
-                    tmp = image.convert() # Make without palette
+                    tmp = image.convert()  # Make without palette
                     array_ = np.asarray(tmp)
                     if len(array_.shape) == 0:
                         raise MemoryError("Too little memory to convert PIL image to array")
@@ -302,7 +301,6 @@ class GifWriter(object):
         # Prepare
         ims2 = [images[0]]
         coords = [(0, 0)]
-        t0 = time.time()
 
         # Iterate over images
         prev = images[0]
@@ -319,7 +317,7 @@ class GifWriter(object):
             if X.size and Y.size:
                 x0, x1 = int(X[0][0]), int(X[-1][0]+1)
                 y0, y1 = int(Y[0][0]), int(Y[-1][0]+1)
-            else: # No change ... make it minimal
+            else:  # No change ... make it minimal
                 x0, x1 = 0, 2
                 y0, y1 = 0, 2
 
@@ -360,14 +358,18 @@ class GifWriter(object):
         if nq >= 1:
             # NeuQuant algorithm
             for image in images:
-                image = image.convert("RGBA") # NQ assumes RGBA
-                nq_instance = NeuQuant(image, int(nq)) # Learn colors from image
+                image = image.convert("RGBA")  # NQ assumes RGBA
+                # Learn colors from image
+                nq_instance = NeuQuant(image, int(nq))
                 if dither:
-                    image = image.convert("RGB").quantize(palette=nq_instance.paletteImage(), colors=255)
+                    image = image.convert("RGB").quantize(
+                        palette=nq_instance.paletteImage(), colors=255)
                 else:
-                    image = nq_instance.quantize(image, colors=255)  # Use to quantize the image itself
+                    # Use to quantize the image itself
+                    image = nq_instance.quantize(image, colors=255)
 
-                self.transparency = True # since NQ assumes transparency
+                # since NQ assumes transparency
+                self.transparency = True
                 if self.transparency:
                     alpha = image.split()[3]
                     mask = Image.eval(alpha, lambda a: 255 if a <= 128 else 0)
@@ -378,7 +380,7 @@ class GifWriter(object):
             for i in range(len(images)):
                 image = images[i].convert('RGB').convert(
                     'P',
-                    palette=Image.ADAPTIVE, # Adaptive PIL algorithm
+                    palette=Image.ADAPTIVE,  # Adaptive PIL algorithm
                     dither=dither,
                     colors=255
                 )
@@ -453,13 +455,13 @@ class GifWriter(object):
                 if (palette != global_palette) or (disposes[frames] != 2):
                     # Use local color palette
                     file_.write(graphext)
-                    file_.write(lid) # write suitable image descriptor
-                    file_.write(palette) # write local color table
-                    file_.write(b'\x08') # LZW minimum size code
+                    file_.write(lid)      # write suitable image descriptor
+                    file_.write(palette)  # write local color table
+                    file_.write(b'\x08')  # LZW minimum size code
                 else:
                     # Use global color palette
                     file_.write(graphext)
-                    file_.write(imdes) # write suitable image descriptor
+                    file_.write(imdes)  # write suitable image descriptor
 
                 # Write image data
                 for datum in data:
@@ -473,9 +475,9 @@ class GifWriter(object):
         return frames
 
 
-## Exposed functions
-def write_gif(filename, images, duration=0.1, repeat=True, dither=False,
-        nq=0, sub_rectangles=True, dispose=None):
+# Exposed functions
+def write_gif(filename, images, duration=0.1,
+              repeat=True, dither=False, nq=0, sub_rectangles=True, dispose=None):
     """ write_gif(filename, images, duration=0.1, repeat=True, dither=False,
                     nq=0, sub_rectangles=True, dispose=None)
 
@@ -526,13 +528,13 @@ def write_gif(filename, images, duration=0.1, repeat=True, dither=False,
 
     # Instantiate writer object
     gif_writer = GifWriter()
-    gif_writer.transparency = False # init transparency flag used in GifWriter functions
+    gif_writer.transparency = False  # init transparency flag used in GifWriter functions
 
     # Check loops
     if repeat is False:
         loops = 1
     elif repeat is True:
-        loops = 0 # zero means infinite
+        loops = 0  # zero means infinite
     else:
         loops = int(repeat)
 
@@ -548,11 +550,11 @@ def write_gif(filename, images, duration=0.1, repeat=True, dither=False,
     # Check subrectangles
     if sub_rectangles:
         images, xy = gif_writer.handle_sub_rectangles(images, sub_rectangles)
-        default_dispose = 1 # Leave image in place
+        default_dispose = 1  # Leave image in place
     else:
         # Normal mode
         xy = [(0, 0) for im in images]
-        default_dispose = 2 # Restore to background color.
+        default_dispose = 2  # Restore to background color.
 
     # Check dispose
     if dispose is None:
@@ -600,7 +602,7 @@ def read_gif(filename, as_numpy=True):
     try:
         while True:
             # Get image as numpy array
-            tmp = pil_image.convert() # Make without palette
+            tmp = pil_image.convert()  # Make without palette
             array_ = np.asarray(tmp)
             if len(array_.shape) == 0:
                 raise MemoryError("Too little memory to convert PIL image to array")
@@ -660,32 +662,32 @@ class NeuQuant:
 
     """
 
-    NCYCLES = None # Number of learning cycles
-    NETSIZE = None # Number of colours used
-    SPECIALS = None # Number of reserved colours used
-    BGCOLOR = None # Reserved background colour
+    NCYCLES = None  # Number of learning cycles
+    NETSIZE = None  # Number of colours used
+    SPECIALS = None  # Number of reserved colours used
+    BGCOLOR = None  # Reserved background colour
     CUTNETSIZE = None
     MAXNETPOS = None
 
-    INITRAD = None # For 256 colours, radius starts at 32
+    INITRAD = None  # For 256 colours, radius starts at 32
     RADIUSBIASSHIFT = None
     RADIUSBIAS = None
     INITBIASRADIUS = None
-    RADIUSDEC = None # Factor of 1/30 each cycle
+    RADIUSDEC = None  # Factor of 1/30 each cycle
 
     ALPHABIASSHIFT = None
-    INITALPHA = None # biased by 10 bits
+    INITALPHA = None  # biased by 10 bits
 
     GAMMA = None
     BETA = None
     BETAGAMMA = None
 
-    network = None # The network itself
-    colormap = None # The network itself
+    network = None  # The network itself
+    colormap = None  # The network itself
 
-    netindex = None # For network lookup - really 256
+    netindex = None  # For network lookup - really 256
 
-    bias = None # Bias and freq arrays for learning
+    bias = None  # Bias and freq arrays for learning
     freq = None
 
     pimage = None
@@ -728,32 +730,32 @@ class NeuQuant:
         """
         Sets class constants
         """
-        self.NCYCLES = 100 # Number of learning cycles
-        self.NETSIZE = colors # Number of colours used
-        self.SPECIALS = 3 # Number of reserved colours used
-        self.BGCOLOR = self.SPECIALS-1 # Reserved background colour
+        self.NCYCLES = 100  # Number of learning cycles
+        self.NETSIZE = colors  # Number of colours used
+        self.SPECIALS = 3  # Number of reserved colours used
+        self.BGCOLOR = self.SPECIALS-1  # Reserved background colour
         self.CUTNETSIZE = self.NETSIZE - self.SPECIALS
         self.MAXNETPOS = self.NETSIZE - 1
 
-        self.INITRAD = self.NETSIZE/8 # For 256 colours, radius starts at 32
+        self.INITRAD = self.NETSIZE/8  # For 256 colours, radius starts at 32
         self.RADIUSBIASSHIFT = 6
         self.RADIUSBIAS = 1 << self.RADIUSBIASSHIFT
         self.INITBIASRADIUS = self.INITRAD * self.RADIUSBIAS
-        self.RADIUSDEC = 30 # Factor of 1/30 each cycle
+        self.RADIUSDEC = 30  # Factor of 1/30 each cycle
 
-        self.ALPHABIASSHIFT = 10 # Alpha starts at 1
-        self.INITALPHA = 1 << self.ALPHABIASSHIFT # biased by 10 bits
+        self.ALPHABIASSHIFT = 10  # Alpha starts at 1
+        self.INITALPHA = 1 << self.ALPHABIASSHIFT  # biased by 10 bits
 
         self.GAMMA = 1024.0
         self.BETA = 1.0/1024.0
         self.BETAGAMMA = self.BETA * self.GAMMA
 
-        self.network = np.empty((self.NETSIZE, 3), dtype='float64') # The network itself
-        self.colormap = np.empty((self.NETSIZE, 4), dtype='int32') # The network itself
+        self.network = np.empty((self.NETSIZE, 3), dtype='float64')  # The network itself
+        self.colormap = np.empty((self.NETSIZE, 4), dtype='int32')  # The network itself
 
-        self.netindex = np.empty(256, dtype='int32') # For network lookup - really 256
+        self.netindex = np.empty(256, dtype='int32')  # For network lookup - really 256
 
-        self.bias = np.empty(self.NETSIZE, dtype='float64') # Bias and freq arrays for learning
+        self.bias = np.empty(self.NETSIZE, dtype='float64')  # Bias and freq arrays for learning
         self.freq = np.empty(self.NETSIZE, dtype='float64')
 
         self.pixels = None
@@ -763,7 +765,6 @@ class NeuQuant:
 
     def write_colour_map(self, rgb, outstream):
         """
-        
         """
         for i in range(self.NETSIZE):
             blue = self.colormap[i, 0]
@@ -803,7 +804,7 @@ class NeuQuant:
 
     def altersingle(self, alpha, i, b, g, r):
         """Move neuron i towards biased (b,g,r) by factor alpha"""
-        n = self.network[i] # Alter hit neuron
+        n = self.network[i]  # Alter hit neuron
         n[0] -= (alpha*(n[0] - b))
         n[1] -= (alpha*(n[1] - g))
         n[2] -= (alpha*(n[2] - r))
@@ -877,15 +878,14 @@ class NeuQuant:
         if rad <= 1:
             rad = 0
 
-        print("Beginning 1D learning: samplepixels = %1.2f  rad = %i" %
-                                                    (samplepixels, rad))
+        print("Beginning 1D learning: samplepixels = %1.2f  rad = %i" % (samplepixels, rad))
         step = 0
         pos = 0
-        if lengthcount%NeuQuant.PRIME1 != 0:
+        if lengthcount % NeuQuant.PRIME1 != 0:
             step = NeuQuant.PRIME1
-        elif lengthcount%NeuQuant.PRIME2 != 0:
+        elif lengthcount % NeuQuant.PRIME2 != 0:
             step = NeuQuant.PRIME2
-        elif lengthcount%NeuQuant.PRIME3 != 0:
+        elif lengthcount % NeuQuant.PRIME3 != 0:
             step = NeuQuant.PRIME3
         else:
             step = NeuQuant.PRIME4
@@ -893,32 +893,32 @@ class NeuQuant:
         i = 0
         printed_string = ''
         while i < samplepixels:
-            if i%100 == 99:
+            if i % 100 == 99:
                 tmp = '\b'*len(printed_string)
                 printed_string = str((i+1)*100/samplepixels)+"%\n"
                 print(tmp + printed_string)
             p = self.pixels[pos]
             r = (p >> 16) & 0xff
-            g = (p >>  8) & 0xff
-            b = (p      ) & 0xff
+            g = (p >> 8) & 0xff
+            b = (p) & 0xff
 
-            if i == 0: # Remember background colour
+            if i == 0:  # Remember background colour
                 self.network[self.BGCOLOR] = [b, g, r]
 
             j = self.special_find(b, g, r)
             if j < 0:
                 j = self.contest(b, g, r)
 
-            if j >= self.SPECIALS: # Don't learn for specials
+            if j >= self.SPECIALS:  # Don't learn for specials
                 a = (1.0 * alpha) / self.INITALPHA
                 self.altersingle(a, j, b, g, r)
                 if rad > 0:
                     self.alterneigh(a, rad, j, b, g, r)
 
-            pos = (pos+step)%lengthcount
+            pos = (pos+step) % lengthcount
 
             i += 1
-            if i%delta == 0:
+            if i % delta == 0:
                 alpha -= alpha / alphadec
                 biasRadius -= biasRadius / self.RADIUSDEC
                 rad = biasRadius >> self.RADIUSBIASSHIFT
@@ -944,13 +944,13 @@ class NeuQuant:
             p = self.colormap[i]
             q = None
             smallpos = i
-            smallval = p[1] # Index on g
+            smallval = p[1]  # Index on g
             # Find smallest in i..self.NETSIZE-1
             for j in range(i+1, self.NETSIZE):
                 q = self.colormap[j]
-                if q[1] < smallval: # Index on g
+                if q[1] < smallval:  # Index on g
                     smallpos = j
-                    smallval = q[1] # Index on g
+                    smallval = q[1]  # Index on g
 
             q = self.colormap[smallpos]
             # Swap p (i) and q (smallpos) entries
@@ -965,7 +965,7 @@ class NeuQuant:
                 previouscol = smallval
                 startpos = i
         self.netindex[previouscol] = (startpos+self.MAXNETPOS) >> 1
-        for j in range(previouscol+1, 256): # Really 256
+        for j in range(previouscol+1, 256):  # Really 256
             self.netindex[j] = self.MAXNETPOS
 
     def paletteImage(self):
@@ -1033,6 +1033,7 @@ class NeuQuant:
         dists = (self.colormap[:, :3] - np.array([r, g, b]))
         a = np.argmin((dists*dists).sum(1))
         return a
+
 
 def load_images(image_directory, extension, prefix=None):
     """
