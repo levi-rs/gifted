@@ -15,6 +15,11 @@ setup(
         'numpy',
         'Pillow',
     ],
+    entry_points={
+        "console_scripts": [
+            "gifted=gifted.cli:main"
+        ]
+    },
     keywords="gif animated image",
     classifiers=[
         'Development Status :: 3 - Alpha',
