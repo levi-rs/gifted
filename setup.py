@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="gifted",
-    version="0.0.2",
+    version="0.0.3",
     description="Gif creation and manipulation tool",
     url='https://github.com/levi-rs/gifted',
     author='Levi Noecker',
