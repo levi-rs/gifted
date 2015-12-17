@@ -1,7 +1,7 @@
 import os
 import argparse
 
-from gifted.gifted import load_images, write_gif
+from gifted.libgif import load_images, write_gif
 
 
 # Strings
